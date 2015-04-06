@@ -62,10 +62,30 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
          */
         @SuppressWarnings("unchecked")
         SecondaryMap(Set<K> givenKeys) {
+        	m = givenKeys.size() * givenKeys.size();
+        	keys = (K[]) new Object[m];
+        	values = (V[]) new Object[m];
+        	
+        	h = UniversalHashFactory.makeHashFunction(p, m);
+        	while (collisionCheck(h, givenKeys)) 
+        		h = UniversalHashFactory.makeHashFunction(m, m);        	
+        }
 
-            // TODO
-            
-            
+        /**
+         * Check to see if the given hash function will result in any of the given 
+         * keys colliding with one another.
+         * @param h The hash function
+         * @param givenKeys The keys
+         * @return false if there are no collisions, true if there are collisions
+         */
+        private boolean collisionCheck(HashFunction<Object> h, Set<K> givenKeys) {
+        	boolean[] temp = new boolean[m];
+        	for (K item: givenKeys) {
+        		if(temp[h.hash(item)])
+        			return true;
+        		temp[h.hash(item)] = true;
+        	}
+        	return false;
         }
         
         /**
@@ -73,12 +93,11 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
          * key was known ahead of time.
          * @param key The key to this association
          * @param val The value to which this key is associated
-         */
-             
+         */  
         public void put(K key, V val) {
-
-            // TODO
-
+        	int index = h.hash(key);
+        	keys[index] = key;
+        	values[index] = val;
         }
 
         /**
@@ -87,10 +106,9 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
          * @return The value associated with this key, null if none exists
          */
        public V get(K key) {
-
-           // TODO
-
-           return null;
+    	   if (containsKey(key))
+    		   return values[h.hash	(key)];
+    	   return null;
        }
 
        /**
@@ -99,11 +117,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         * @return true if there is an association for this key, false otherwise
         */
        public boolean containsKey(K key) {
-
-           // TODO
-           
-           return false;
-       
+    	   return keys[h.hash(key)] != null;                
        }
 
        /**
@@ -111,9 +125,9 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         * @param key The key to remove
         */
        public void remove(K key) {
-
-           // TODO
-       
+    	   int index = h.hash(key);
+    	   keys[index] = null;
+    	   values[index] = null;
        }
 
        /**
@@ -163,9 +177,28 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      */
     @SuppressWarnings("unchecked")
     public PerfectHashMap(K[] keys) {
-
-        // TODO
-
+    	m = keys.length;
+    	p = PrimeSource.nextOrEqPrime(m + 1);
+    	h = UniversalHashFactory.makeHashFunction(p, m);
+    	
+    	secondaries = (SecondaryMap[]) new PerfectHashMap.SecondaryMap[m];
+    	for (K item: keys) {
+    		int index = h.hash(item);
+    		Set<K> set = new ListSet<K>();
+    		
+    		// no collisions yet
+    		if (secondaries[index] == null) {
+    			set.add(item);
+    			secondaries[index] = new PerfectHashMap.SecondaryMap(set);
+    		} 
+    		// there's  a collision
+    		else {
+    			set.add(item);
+    			for (int i = 0; i < secondaries[index].keys.length; i++)
+    				set.add(secondaries[index].keys[i]);
+    			secondaries[index] = new PerfectHashMap.SecondaryMap(set);
+    		}	
+    	}	
     }
     
     /**
@@ -175,9 +208,8 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      * @param val The value to which this key is associated
      */
     public void put(K key, V val) {
-
-        // TODO
-    
+    	//int index = h.hash(key);
+    	//secondaries[index].put(key, val);
     }
 
     /**
@@ -186,10 +218,9 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      * @return The value associated with this key, null if none exists
      */
    public V get(K key) {
-
-       // TODO
-
-       return null;
+	   //int index = h.hash(key);
+       //return secondaries[index].get(key);
+	   return null;
    }
 
    /**
@@ -198,10 +229,9 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     * @return true if there is an association for this key, false otherwise
     */
     public boolean containsKey(K key) {
-
-        // TODO
-
-        return false;
+    	//int index = h.hash(key);
+        //return secondaries[index].containsKey(key);
+    	return true;
     }
 
     /**
@@ -209,9 +239,8 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      * @param key The key to remove
      */
     public void remove(K key) {
-        
-        // TODO
-    
+    	//int index = h.hash(key);
+    	//secondaries[index].remove(key);    
     }
     
     /**

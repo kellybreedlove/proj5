@@ -11,7 +11,7 @@ import adt.Map;
  * Quick hack-up of a linear-probing approach to
  * a hash map.
  *
- * @author Thomas VanDrunen
+ * @author Thomas VanDrunen & Kelly Breedlove
  * CSCI 345, Wheaton College
  * July 30, 2014
  * @param <K> The key-type of the map
@@ -44,9 +44,8 @@ public class LinProbHashMap<K, V> implements Map<K, V> {
      */
     @SuppressWarnings("unchecked")
     public LinProbHashMap(int initKeyCap) {
-
-        // TODO
-    
+    	keys = (K[]) new Object[2*initKeyCap];
+    	values = (V[]) new Object[2*initKeyCap];
     }
 
     public LinProbHashMap() {
@@ -72,11 +71,11 @@ public class LinProbHashMap<K, V> implements Map<K, V> {
      * one where the key could go, if it doesn't yet exist.
      */
     private int findIndex(K key) {
-
-        // TODO
-        
-        return 0;
-    
+    	// starting at the ideal position, look for the key or the first null position
+    	int index = hash(key);
+    	while (keys[index] != null && !keys[index].equals(key)) 
+    		index = ((index + 1) % keys.length);
+        return index;
     }
 
     /**
@@ -86,9 +85,15 @@ public class LinProbHashMap<K, V> implements Map<K, V> {
      * @param val The value to which this key is associated
      */
     public void put(K key, V val) {
-
-        // TODO
-        
+    	
+    	// don't let the hash table get too full
+    	if (pairs >= keys.length/2) 
+    		rehash();
+    	
+    	int index = findIndex(key);
+    	keys[index] = key;
+    	values[index] = val;
+    	pairs++;
     }
 
     /**
@@ -152,13 +157,17 @@ public class LinProbHashMap<K, V> implements Map<K, V> {
      * or after the gap.
      */
     private int compareIdealPlace(int gap, int position) {
-
-        // TODO
+    	assert(keys[position] != null);
+    	int index = hash(keys[position]);
+    	
+    	// ideal index is in the range (gap, position)
+    	if (gap < index && index < position) return -1;
+    	
+    	// gap is the ideal index
+        if (gap == index) return 0;
         
-        // (suggested helper function for remove())
-        
-        return 0;
-        
+        // ideal index is outside of the range (gap, position)
+        return 1;
     }
     
     /**
@@ -166,9 +175,21 @@ public class LinProbHashMap<K, V> implements Map<K, V> {
      * @param key The key to remove
      */
     public void remove(K key) {
+    	if (!containsKey(key)) return;
         
-        // TODO
-    
+        // remove the appropriate key and value by creating a gap
+        int gap = findIndex(key);
+        keys[gap] = null;
+        values[gap] = null;
+        pairs--;
+
+        // scoot everything over
+        for (int i = gap; keys[i] != null; i = ((i + 1) % keys.length))
+        	if (compareIdealPlace(gap, i) <= 0) {
+        		keys[gap] = keys[i];
+        		values[gap] = values[i];
+        		gap++;
+        	}
     }
     
     /**
@@ -176,11 +197,36 @@ public class LinProbHashMap<K, V> implements Map<K, V> {
      * @return The iterator.
      */
     public Iterator<K> iterator() {
+    	
+    	// find the first nonnull key index
+    	int j = 0;
+    	while (j < keys.length && keys[j] == null) j++;
+    	final int start = j;
+    	
+    	return new Iterator<K>() {
 
-        // TODO
-        
-        return null;
-        
+    		// the next thing to be returned
+    		int i = start;
+    		
+			public boolean hasNext() {
+				return i < keys.length;
+			}
+
+			public K next() {
+				int index = i++;
+				
+				// find the next nonnull key index
+				while (i < keys.length && keys[i] == null) i++;
+				
+				return keys[index];
+			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
+				
+			}
+    		
+    	};
     }
 
 }
