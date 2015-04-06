@@ -68,9 +68,9 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         	keys = (K[]) new Object[m];
         	values = (V[]) new Object[m];
         	
-        	h = UniversalHashFactory.makeHashFunction(p, m);
+        	h = UniversalHashFactory.makeHashFunction(p, m, f);
         	while (collisionCheck(h, givenKeys)) 
-        		h = UniversalHashFactory.makeHashFunction(m, m);        	
+        		h = UniversalHashFactory.makeHashFunction(p, m, f);        	
         }
 
         /**
@@ -83,7 +83,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         private boolean collisionCheck(HashFunction<Object> h, Set<K> givenKeys) {
         	boolean[] hashedTo = new boolean[m];
         	for (K item: givenKeys) {
-        		int index = Math.abs(h.hash(item));
+        		int index = h.hash(item);
         		if(hashedTo[index])
         			return true;
         		hashedTo[index] = true;
@@ -98,7 +98,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
          * @param val The value to which this key is associated
          */  
         public void put(K key, V val) {
-        	int index = Math.abs(h.hash(key));
+        	int index = h.hash(key);
         	keys[index] = key;
         	values[index] = val;
         }
@@ -110,7 +110,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
          */
        public V get(K key) {
     	   if (containsKey(key))
-    		   return values[Math.abs(h.hash(key))];
+    		   return values[h.hash(key)];
     	   return null;
        }
 
@@ -120,7 +120,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         * @return true if there is an association for this key, false otherwise
         */
        public boolean containsKey(K key) {
-    	   return keys[Math.abs(h.hash(key))] != null;                
+    	   return keys[h.hash(key)] != null;                
        }
 
        /**
@@ -128,7 +128,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         * @param key The key to remove
         */
        public void remove(K key) {
-    	   int index = Math.abs(h.hash(key));
+    	   int index = h.hash(key);
     	   keys[index] = null;
     	   values[index] = null;
        }
@@ -162,6 +162,11 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      * Secondary maps
      */
     private SecondaryMap[] secondaries;
+    
+    /**
+     * An extra mod to keep from negative hash values
+     */
+    private int f;
 
     /**
      * A prime number greater than the greatest hash value
@@ -187,13 +192,14 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     @SuppressWarnings("unchecked")
     public PerfectHashMap(K[] keys) {
     	m = keys.length;
-    	p = PrimeSource.nextOrEqPrime(m + 1);
-    	h = UniversalHashFactory.makeHashFunction(p, m);
+    	f = 100;
+    	p = PrimeSource.nextOrEqPrime(f + 1);
+    	h = UniversalHashFactory.makeHashFunction(p, m, f);
     	secondaries = (SecondaryMap[]) new PerfectHashMap.SecondaryMap[m];
 
     	// Go through all of the keys, note how many things hash to each available index
     	int[] collisionCounts = new int[m];
-    	for (K item: keys) collisionCounts[Math.abs(h.hash(item))]++;
+    	for (K item: keys) collisionCounts[h.hash(item)]++;
 
     	// for each position in secondaries
     	for (int i = 0; i < m; i++) {
@@ -203,7 +209,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     		
     		while (collisionCounts[i] > 0) // # things left that map to i
     			for (K item: keys) // look for those things
-    				if (Math.abs(h.hash(item)) == i && !keySet.contains(item)) { // if this thing maps to i
+    				if (h.hash(item) == i && !keySet.contains(item)) { // if this thing maps to i
     					keySet.add(item); // add it to the set for i
     					collisionCounts[i]--; // decrement # things left that map to i
     				}
@@ -221,7 +227,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      * @param val The value to which this key is associated
      */
     public void put(K key, V val) {
-    	int index = Math.abs(h.hash(key));
+    	int index = h.hash(key);
     	secondaries[index].put(key, val);
     }
 
@@ -231,7 +237,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      * @return The value associated with this key, null if none exists
      */
    public V get(K key) {
-	   int index = Math.abs(h.hash(key));
+	   int index = h.hash(key);
        return secondaries[index].get(key);
 	   //return null;
    }
@@ -242,7 +248,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     * @return true if there is an association for this key, false otherwise
     */
     public boolean containsKey(K key) {
-    	int index = Math.abs(h.hash(key));
+    	int index = h.hash(key);
         return secondaries[index].containsKey(key);
     	//return true;
     }
@@ -252,7 +258,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      * @param key The key to remove
      */
     public void remove(K key) {
-    	int index = Math.abs(h.hash(key));
+    	int index = h.hash(key);
     	secondaries[index].remove(key);    
     }
     
