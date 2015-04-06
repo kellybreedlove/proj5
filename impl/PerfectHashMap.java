@@ -55,13 +55,19 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         HashFunction<Object> h;
         
         /**
+         * The max number of items to be in this secondary map, in this case givenKeys.size()
+         */
+        int numItems;
+        
+        /**
          * Constructor. Given a set of keys, make appropriately
          * size arrays and a hash set that makes no collisions.
          * @param givenKeys
          */
         @SuppressWarnings("unchecked")
         SecondaryMap(Set<K> givenKeys) {
-        	m = givenKeys.size() == 0 ? 1 : givenKeys.size() * givenKeys.size();
+        	numItems = givenKeys.size();
+        	m = numItems == 0 ? 1 : numItems * numItems;
         	keys = (K[]) new Object[m];
         	values = (V[]) new Object[m];
         	
@@ -125,9 +131,11 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         * @param key The key to remove
         */
        public void remove(K key) {
-    	   int index = h.hash(key);
-    	   keys[index] = null;
-    	   values[index] = null;
+    	   if (containsKey(key)) {
+    		   int index = h.hash(key);
+    		   keys[index] = null;
+    		   values[index] = null;
+    	   }
        }
 
        /**
@@ -253,10 +261,10 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      */
     public Iterator<K> iterator() {
     	int j = 0;
-        while (j < secondaries.length && secondaries[j] == null) j++;
-        final int start = j;
+    	while (j < secondaries.length && secondaries[j].numItems == 0) j++;
+    	final int start = j;
         
-        return new Iterator<K>() {
+    	return new Iterator<K>() {
         	int i = start;
         	Iterator<K> it = secondaries[i].iterator();
         	K item = it.next();  	
@@ -277,6 +285,6 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}       	
-        };    
+        };   
     }
 }
