@@ -1,10 +1,7 @@
 package impl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Random;
 
 import adt.Map;
 import adt.Set;
@@ -120,7 +117,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         * @return true if there is an association for this key, false otherwise
         */
        public boolean containsKey(K key) {
-    	   return keys[h.hash(key)] != null;                
+    	   return keys[h.hash(key)] == key;                
        }
 
        /**
@@ -164,7 +161,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     private SecondaryMap[] secondaries;
     
     /**
-     * An extra mod to keep from negative hash values
+     * An extra value to mod by to avoid negative hash values
      */
     private int f;
 
@@ -196,27 +193,18 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     	p = PrimeSource.nextOrEqPrime(f + 1);
     	h = UniversalHashFactory.makeHashFunction(p, m, f);
     	secondaries = (SecondaryMap[]) new PerfectHashMap.SecondaryMap[m];
+    	
+    	// declare and initialize an array of sets
+    	ArrayList<ListSet<K>> keySets = new ArrayList<ListSet<K>>();
+    	for (int i = 0; i < m; i++) keySets.add(new ListSet<K>());
 
-    	// Go through all of the keys, note how many things hash to each available index
-    	int[] collisionCounts = new int[m];
-    	for (K item: keys) collisionCounts[h.hash(item)]++;
+    	// populate it
+    	for (K item: keys) keySets.get(h.hash(item)).add(item);
 
-    	// for each position in secondaries
-    	for (int i = 0; i < m; i++) {
-    		
-    		// create a set to be used when creating secondary map
-    		ListSet<K> keySet = new ListSet<K>();
-    		
-    		while (collisionCounts[i] > 0) // # things left that map to i
-    			for (K item: keys) // look for those things
-    				if (h.hash(item) == i && !keySet.contains(item)) { // if this thing maps to i
-    					keySet.add(item); // add it to the set for i
-    					collisionCounts[i]--; // decrement # things left that map to i
-    				}
-    		
-    		assert (collisionCounts[i] == 0);
-    		secondaries[i] = new PerfectHashMap.SecondaryMap(keySet);
-    	}
+    	// initialize secondaries with collected sets
+    	for (int i = 0; i < m; i++)
+    		secondaries[i] = new PerfectHashMap.SecondaryMap(keySets.get(i));
+    
     	
     }
     
@@ -239,7 +227,6 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
    public V get(K key) {
 	   int index = h.hash(key);
        return secondaries[index].get(key);
-	   //return null;
    }
 
    /**
@@ -250,7 +237,6 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     public boolean containsKey(K key) {
     	int index = h.hash(key);
         return secondaries[index].containsKey(key);
-    	//return true;
     }
 
     /**
@@ -266,10 +252,31 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      * Return an iterator over this map
      */
     public Iterator<K> iterator() {
-
-        // TODO
+    	int j = 0;
+        while (j < secondaries.length && secondaries[j] == null) j++;
+        final int start = j;
         
-        return null;
+        return new Iterator<K>() {
+        	int i = start;
+        	Iterator<K> it = secondaries[i].iterator();
+        	K item = it.next();  	
+			public boolean hasNext() {
+				return i < secondaries.length;
+			}	
+			public K next() {
+				K temp = item;
+				if (it.hasNext()) {
+					item = it.next();
+				} else {
+					while (i < secondaries.length && secondaries[i] == null) i++;
+					it = secondaries[++i].iterator();
+					item = it.next();
+				}
+				return temp;
+			}	
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}       	
+        };    
     }
- 
 }
