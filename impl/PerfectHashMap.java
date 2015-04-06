@@ -143,7 +143,8 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         */
         public Iterator<K> iterator() {
         	int j = 0;
-            while (j < keys.length && keys[j] == null) j++;
+        	if (numItems != 0)
+        		while (j < keys.length && keys[j] == null) j++;
             final int start = j;
             
             return new Iterator<K>() {
