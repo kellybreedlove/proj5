@@ -12,7 +12,7 @@ import impl.PerfectHashMap;
  */
 public class PHMapExperiment extends HashMapExperiment {
 
-	public PHMapExperiment() { reset(); }
+	public PHMapExperiment() { type = "PerfectHashMap"; reset(); }
 	
 	/**
 	 * Reset the testMap to a LPHMapTreeMap.

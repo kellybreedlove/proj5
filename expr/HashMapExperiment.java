@@ -1,6 +1,8 @@
 package expr;
 
 import java.io.FileInputStream;
+import java.util.Scanner;
+
 import adt.Map;
 
 /**
@@ -11,6 +13,7 @@ import adt.Map;
  * 6 April 2015
  * 
  * Some of this code is borrowed/modeled after TVD's MapTest code.
+ * Very similar to TreeMapExperiment from proj3.
  */
 
 public abstract class HashMapExperiment {
@@ -44,6 +47,11 @@ public abstract class HashMapExperiment {
 		}
 	}
 
+	/**
+	 * The type of the map being tested.
+	 */
+	protected String type;
+	
 	/**
      * The stopwatch for this experiment
      */
@@ -79,7 +87,24 @@ public abstract class HashMapExperiment {
     	//initialize keys and values
     	keys = new String[1000];
     	values = new String[2000];
+    	
+    	try {
+			Scanner keysIn = new Scanner(new FileInputStream(keysInput));
+			Scanner valuesIn = new Scanner(new FileInputStream(valuesInput));
+			for (int i = 0; i < keys.length; i++) 
+				keys[i] = keysIn.nextLine();
+			for (int i = 0; i < values.length; i++) 
+				values[i] = valuesIn.nextLine();
+			keysIn.close();
+			valuesIn.close();
+		} catch (Exception e) { 	System.out.println("data scan in error"); }
     }
+    
+    /**
+     * An accessor method for type
+     * @return type
+     */
+    public String getType() { return type; }
 
     /**
      * Reset the testMap.
@@ -96,7 +121,7 @@ public abstract class HashMapExperiment {
     }
 	
     /**
-     * Test put runtimes for BasicBST, AVL, and RedBlack trees.
+     * Test put runtimes for BasicHashMap, LinearProbHashMap, and PerfectHashMap.
      * @return 
      * @return The runtime in seconds
      */
@@ -108,11 +133,10 @@ public abstract class HashMapExperiment {
     }
 	
     /**
-     * Test get runtimes for BasicBST, AVL, and RedBlack trees.
+     * Test get runtimes for BasicHashMap, LinearProbHashMap, and PerfectHashMap.
      * @return The runtime in seconds
      */
     public long getRuntimes(int pairs) {
-	String scrap;
 	reset();
 	populate(pairs);
 	stopwatch = new Stopwatch();
@@ -122,11 +146,10 @@ public abstract class HashMapExperiment {
     }
 	
     /**
-     * Test get runtimes for BasicBST, AVL, and RedBlack trees.
+     * Test get runtimes for BasicHashMap, LinearProbHashMap, and PerfectHashMap.
      * @return The runtime in seconds
      */
     public long getWorstCaseRuntimes(int pairs) {
-	String scrap;
 	reset();
 	populate(pairs);
 	stopwatch = new Stopwatch();
@@ -136,11 +159,10 @@ public abstract class HashMapExperiment {
     }
 	
     /**
-     * Test containsKey runtimes for BasicBST, AVL, and RedBlack trees.
+     * Test containsKey runtimes for BasicHashMap, LinearProbHashMap, and PerfectHashMap.
      * @return The runtime in seconds
      */
     public long containsKeyRuntimes(int pairs) {
-	Boolean scrap;
 	reset();
 	populate(pairs);
 	stopwatch = new Stopwatch();
@@ -150,11 +172,10 @@ public abstract class HashMapExperiment {
     }
 	
     /**
-     * Test containsKey runtimes for BasicBST, AVL, and RedBlack trees.
+     * Test containsKey runtimes for BasicHashMap, LinearProbHashMap, and PerfectHashMap.
      * @return The runtime in seconds
      */
     public long containsKeyWorstCaseRuntimes(int pairs) {
-	Boolean scrap;
 	reset();
 	populate(pairs);
 	stopwatch = new Stopwatch();

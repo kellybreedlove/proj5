@@ -12,7 +12,7 @@ import impl.BasicHashMap;
  */
 public class BHMapExperiment extends HashMapExperiment {
 
-	public BHMapExperiment() { reset(); }
+	public BHMapExperiment() { type = "BasicHashMap"; reset(); }
 	
 	/**
 	 * Reset the testMap to a LPHMapTreeMap.

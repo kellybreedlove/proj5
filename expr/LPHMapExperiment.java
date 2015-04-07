@@ -12,7 +12,7 @@ import impl.LinProbHashMap;
  */
 public class LPHMapExperiment extends HashMapExperiment {
 
-	public LPHMapExperiment() { reset(); }
+	public LPHMapExperiment() { type = "LinearProbHashMap"; reset(); }
 	
 	/**
 	 * Reset the testMap to a LPHMapTreeMap.
