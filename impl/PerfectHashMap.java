@@ -70,10 +70,12 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         	m = numItems == 0 ? 1 : numItems * numItems;
         	keys = (K[]) new Object[m];
         	values = (V[]) new Object[m];
-        	
-        	h = UniversalHashFactory.makeHashFunction(p, m, f);
-        	while (collisionCheck(h, givenKeys)) 
-        		h = UniversalHashFactory.makeHashFunction(p, m, f);        	
+
+        	//if (m != 0) {
+        		h = UniversalHashFactory.makeHashFunction(p, m, f);
+        		while (collisionCheck(h, givenKeys)) 
+        			h = UniversalHashFactory.makeHashFunction(p, m, f);        	
+        	//}
         }
 
         /**
@@ -142,23 +144,26 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         * The iterator for this portion of the map.
         */
         public Iterator<K> iterator() {
+        	
+        	// find the first nonnull key
         	int j = 0;
-        	if (numItems > 0)
-        		while (j < keys.length && keys[j] == null) j++;
+        	while (j < keys.length-1 && keys[j] == null) j++;
             final int start = j;
             System.out.println("start: " + start + "     lenght: " + keys.length + "     numItems: " + numItems);
             
             return new Iterator<K>() {
             	
+            	// the index of the next key to return
             	int i = start;
             	
-				public boolean hasNext() {
-					return i < keys.length && numItems != 0;
-				}
+				public boolean hasNext() { return i < keys.length; }
+				
 				public K next() {
+					System.out.println("i before index: " + i);
 					int index = i++;
+					System.out.println("i before while: " + i);
 					while (i < keys.length-1 && keys[i] == null) i++;
-					System.out.println("i: " + i + "    length: " + keys.length);
+					System.out.println("i after while: " + i);
 					return keys[index];
 				}
 				public void remove() {
@@ -210,7 +215,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     	// declare and initialize an array of sets
     	ArrayList<ListSet<K>> keySets = new ArrayList<ListSet<K>>();
     	for (int i = 0; i < m; i++) keySets.add(new ListSet<K>());
-
+    	System.out.println("empty set size: " + keySets.get(0).size());
     	// populate it
     	for (K item: keys) keySets.get(h.hash(item)).add(item);
 
@@ -263,32 +268,43 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      * Return an iterator over this map
      */
     public Iterator<K> iterator() {
+    	
+    	// find the first nonnull key
     	int j = 0;
-    	while (j < secondaries.length && secondaries[j].numItems == 0) j++;
+    	System.out.println("Primary pre while - start: " + j + "     lenght: " + secondaries.length + "     numitems: " + secondaries[j].numItems);
+    	while (j < secondaries.length-1 && secondaries[j].numItems == 0) {
+    		System.out.println("j :" + j + "vs length: " + secondaries.length);
+    		j++;
+    	}
     	final int start = j;
-        
+    	System.out.println("Primary post while- start: " + j + "     lenght: " + secondaries.length + "     numitems: " + secondaries[j].numItems);
+    	
     	return new Iterator<K>() {
-        	int i = start;
-        	Iterator<K> it = secondaries[i].iterator();
-        	K item = it.next();  	
         	
-			public boolean hasNext() {
-				return item != null;
-			}	
+    		// the index into secondaries to look at next
+    		int i = start;
+    		// an iterator for the secondary map at i - if i changes, so does it
+    		Iterator<K> it = null;  	
+        	
+			public boolean hasNext() { System.out.println("called primary hasNext() i: " + i); return i < secondaries.length-1; }	
+			
 			public K next() {
-				K temp = item;
-				if (it.hasNext()) {
-					item = it.next();
-				} else if (i == secondaries.length && !it.hasNext()){
-					item = null;				
-				} else {
+				System.out.println("called primary next()");
+				K item = it.next();
+				
+				// if there's nothing left in this secondary map, update i & it
+				if (!it.hasNext()) { 
 					i++;
 					while (i < secondaries.length-1 && secondaries[i] == null) i++;
-					it = secondaries[++i].iterator();
-					item = it.next();
+					if (i < secondaries.length-1)
+						it = secondaries[i].iterator();
+					else
+						it = null;
 				}
-				return temp;
+				System.out.println("i: " + i);
+				return item;
 			}	
+			
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}       	
