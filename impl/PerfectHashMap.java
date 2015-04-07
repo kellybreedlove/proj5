@@ -146,16 +146,18 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         	if (numItems > 0)
         		while (j < keys.length && keys[j] == null) j++;
             final int start = j;
-            System.out.println("start: " + start + "     lenght: " + keys.length);
+            System.out.println("start: " + start + "     lenght: " + keys.length + "     numItems: " + numItems);
             
             return new Iterator<K>() {
+            	
             	int i = start;
+            	
 				public boolean hasNext() {
 					return i < keys.length && numItems != 0;
 				}
 				public K next() {
-					int index = i;
-					while (i < keys.length && keys[i] == null) i++;
+					int index = i++;
+					while (i < keys.length-1 && keys[i] == null) i++;
 					System.out.println("i: " + i + "    length: " + keys.length);
 					return keys[index];
 				}
@@ -280,7 +282,8 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
 				} else if (i == secondaries.length && !it.hasNext()){
 					item = null;				
 				} else {
-					while (i < secondaries.length && secondaries[i] == null) i++;
+					i++;
+					while (i < secondaries.length-1 && secondaries[i] == null) i++;
 					it = secondaries[++i].iterator();
 					item = it.next();
 				}
