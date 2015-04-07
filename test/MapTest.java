@@ -103,7 +103,7 @@ public abstract class MapTest {
 	public void emptyIterator() {
 		reset();
 		int i = 0;
-		for (Iterator<String> it = testMap.iterator(); it.hasNext(); )
+		for (Iterator<String> it = testMap.iterator(); it.hasNext() && i < 50; )
 			i++;
 		assertEquals(0, i);
 	}

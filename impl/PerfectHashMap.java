@@ -25,6 +25,23 @@ import impl.ListSet;
 
 public class PerfectHashMap<K, V> implements Map<K, V> {
 
+	 /**
+     * The (singleton) null object.
+     */
+    private SecondaryMap nully = new SecondaryMap(new ListSet<K>()) {
+		public Iterator<K> iterator() {
+			return new Iterator<K>() {
+				public boolean hasNext() { return false; }
+				public K next() { return null; }
+				public void remove() { throw new UnsupportedOperationException(); }
+			};
+		}
+		public void put(K key, V val) { }
+		public V get(K key) { return null; }
+		public boolean containsKey(K key) { return false; }
+		public void remove(K key) { }
+		public String toString() { return "(:)"; }
+    };
  
     /**
      * Secondary maps for the buckets
@@ -67,15 +84,13 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         @SuppressWarnings("unchecked")
         SecondaryMap(Set<K> givenKeys) {
         	numItems = givenKeys.size();
-        	m = numItems == 0 ? 1 : numItems * numItems;
+        	m = numItems * numItems;
         	keys = (K[]) new Object[m];
         	values = (V[]) new Object[m];
 
-        	//if (m != 0) {
-        		h = UniversalHashFactory.makeHashFunction(p, m, f);
-        		while (collisionCheck(h, givenKeys)) 
-        			h = UniversalHashFactory.makeHashFunction(p, m, f);        	
-        	//}
+        	h = UniversalHashFactory.makeHashFunction(p, m, f);
+        	while (collisionCheck(h, givenKeys)) 
+        		h = UniversalHashFactory.makeHashFunction(p, m, f);        	
         }
 
         /**
@@ -215,13 +230,17 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     	// declare and initialize an array of sets
     	ArrayList<ListSet<K>> keySets = new ArrayList<ListSet<K>>();
     	for (int i = 0; i < m; i++) keySets.add(new ListSet<K>());
-    	System.out.println("empty set size: " + keySets.get(0).size());
+
     	// populate it
     	for (K item: keys) keySets.get(h.hash(item)).add(item);
 
     	// initialize secondaries with collected sets
-    	for (int i = 0; i < m; i++)
-    		secondaries[i] = new PerfectHashMap.SecondaryMap(keySets.get(i)); 	
+    	for (int i = 0; i < m; i++) {
+    		if (keySets.get(i).size() == 0)
+    			secondaries[i] = nully; // for kinder handling of the empty indexes
+    		else
+    			secondaries[i] = new PerfectHashMap.SecondaryMap(keySets.get(i)); 	
+    	}
     }
     
     /**
@@ -272,8 +291,8 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     	// find the first nonnull key
     	int j = 0;
     	System.out.println("Primary pre while - start: " + j + "     lenght: " + secondaries.length + "     numitems: " + secondaries[j].numItems);
-    	while (j < secondaries.length-1 && secondaries[j].numItems == 0) {
-    		System.out.println("j :" + j + "vs length: " + secondaries.length);
+    	while (j < secondaries.length-1 && secondaries[j] == nully) {
+    		System.out.println("j :" + j + "    length: " + secondaries.length + "   nully" + secondaries[j].toString());
     		j++;
     	}
     	final int start = j;
