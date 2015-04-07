@@ -143,7 +143,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         */
         public Iterator<K> iterator() {
         	int j = 0;
-        	if (numItems != 0)
+        	if (numItems > 0)
         		while (j < keys.length && keys[j] == null) j++;
             final int start = j;
             
@@ -212,9 +212,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
 
     	// initialize secondaries with collected sets
     	for (int i = 0; i < m; i++)
-    		secondaries[i] = new PerfectHashMap.SecondaryMap(keySets.get(i));
-    
-    	
+    		secondaries[i] = new PerfectHashMap.SecondaryMap(keySets.get(i)); 	
     }
     
     /**
