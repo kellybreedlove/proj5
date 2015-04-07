@@ -32,7 +32,8 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      * that'd be messy to handle in a different way.
      */
     private SecondaryMap nully = new SecondaryMap(new ListSet<K>()) {
-		public Iterator<K> iterator() {
+		int numItems = 0;
+    	public Iterator<K> iterator() {
 			return new Iterator<K>() {
 				public boolean hasNext() { return false; }
 				public K next() { return null; }
@@ -43,7 +44,6 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
 		public V get(K key) { return null; }
 		public boolean containsKey(K key) { return false; }
 		public void remove(K key) { }
-		public String toString() { return "(:)"; }
     };
  
     /**
@@ -75,7 +75,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         HashFunction<Object> h;
         
         /**
-         * The max number of items to be in this secondary map, in this case givenKeys.size()
+         * The number of items currently in this map.
          */
         int numItems;
         
@@ -86,8 +86,8 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
          */
         @SuppressWarnings("unchecked")
         SecondaryMap(Set<K> givenKeys) {
-        	numItems = givenKeys.size();
-        	m = numItems * numItems;
+        	numItems = 0;
+        	m = givenKeys.size() * givenKeys.size();
         	keys = (K[]) new Object[m];
         	values = (V[]) new Object[m];
 
@@ -124,6 +124,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         	int index = h.hash(key);
         	keys[index] = key;
         	values[index] = val;
+        	numItems++;
         }
 
         /**
@@ -155,11 +156,13 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     		   int index = h.hash(key);
     		   keys[index] = null;
     		   values[index] = null;
+    		   numItems--;
     	   }
        }
 
        /**
         * The iterator for this portion of the map.
+        * Not used in the primary map iterator.
         */
         public Iterator<K> iterator() {
         	
@@ -167,7 +170,6 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         	int j = 0;
         	while (j < keys.length-1 && keys[j] == null) j++;
             final int start = j;
-            System.out.println("start: " + start + ", max: " + keys.length + ", starting key: " + keys[start]);
             
             return new Iterator<K>() {
             	
@@ -286,95 +288,60 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     /**
      * Return an iterator over this map
      */
-    public Iterator<K> iterator() {
-    	/*
-    	// find the first nonnull key
+    public Iterator<K> iterator() {    	
+    	
+    	int i = 0;
     	int j = 0;
-    	while (j < secondaries.length-1) {
-   			Iterator<K> it = secondaries[j].iterator();
-   			if (it.next() != null)
-   				break;
-    		j++;
-    	}
-    	final int start = j;
-    	System.out.println("Primary Iter Post while j: " + j + ", max: " + secondaries.length);
-    	 */
-
-    	int k = 0;
-    	int l = 0;
-    	while (l < secondaries.length) {	
-    		if (secondaries[l] != nully) {
-    			while (k < secondaries[l].keys.length && secondaries[l].keys[k] == null) k++;
-    			if (k < secondaries[l].keys.length) break;
-    		}
-    		l++;	
-    	}
     	
-    	final int outter = l;
-    	final int inner = k;
-    	System.out.println("Primary Iter, l: " + l + ", max: " + secondaries.length);
-    	System.out.println("k: " + k + ", max: " + secondaries[l].keys.length);
+    	// find the first non empty secondary map
+    	while (i < secondaries.length && secondaries[i].numItems == 0) i++;
     	
-    	return new Iterator<K>() {
-        	int i = outter;
-        	int j = inner;
-        	
-        	public boolean hasNext() { System.out.println("hasNext"); return i < secondaries.length; }
+    	// if i ran off the end, then there is no non empty secondary map, return a null iterator
+    	if (i == secondaries.length) return nully.iterator();
+    	
+    	// once valid i is found, find the first non null value in that secondary map
+    	while (j < secondaries[i].keys.length && secondaries[i].keys[j] == null) j++;
 
-        	public K next() { 
+    	// save them for starter values
+    	final int out = i;
+    	final int in = j;
+    	System.out.println("i: " + i + ", max: " + secondaries.length);
+    	System.out.println("j: " + j + ", max: " + secondaries[i].numItems);
+    	System.out.println("first value: " + secondaries[i].keys[j]);
+        
+        return new Iterator<K>() {
+    
+        	// the values for the next return
+        	int outer = out;
+        	int inner = in;
+
+        	public boolean hasNext() { 
+        		System.out.println("hasNext");
+        		return outer < secondaries.length && inner < secondaries[outer].keys.length; 
+        	}
+
+        	public K next() {
         		System.out.println("next");
-        		K item = secondaries[i].keys[j++];
+        		K item = secondaries[outer].keys[inner++];
 
-        		if (j >= secondaries[i].keys.length) {
-        			i++;
-        			while (i < secondaries.length) {	
-        				if (secondaries[i] != nully) {
-        					while (j < secondaries[i].keys.length && secondaries[i].keys[j] == null) j++;
-        					if (j < secondaries[i].keys.length) break;
-        				}
-        				i++;	
-        	    	}
+        		// find next inner in this outer
+        		while (inner < secondaries[outer].keys.length && secondaries[outer].keys[inner] == null) inner++;
+        		
+        		// if there's no more in the inner, find a new outer
+        		if (inner == secondaries[outer].keys.length) {
+        			outer++;
+        			while (outer < secondaries.length && secondaries[outer].numItems == 0) outer++;
+        			// once a valid outer is found, find the next inner
+        			if (outer != secondaries.length)
+        				while (inner < secondaries[outer].keys.length && secondaries[outer].keys[inner] == null) inner++;
         		}
-        		System.out.println(item);
+        		
+        		System.out.println("next item: " + item);
         		return item;
         	}
         	public void remove() {
-				throw new UnsupportedOperationException();
-			} 
-    		
-    		
-    		
-    		
-    		
-    		/*
-    		// the index into secondaries to look at next
-    		int i = start;
-    		// an iterator for the secondary map at i - if i changes, so does it
-    		Iterator<K> it = secondaries[i].iterator();  	
-        	
-			public boolean hasNext() { return i < secondaries.length-1; }	
-			
-			public K next() {
-				K item = it.next();
-				
-				if (!it.hasNext()) {
-					while (i < secondaries.length-1) {
-						it = secondaries[++i].iterator();
-						if (it.next() != null)
-							break;
-					}			 	
-					it = secondaries[i].iterator();
-				}
-				
-				if (item == null)
-					item = it.next();
-				
-				return item;
-			}	
-			
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}       	*/
+        		throw new UnsupportedOperationException();            
+            }
         };   
     }
 }
