@@ -50,7 +50,12 @@ public abstract class HashMapExperiment {
 	/**
 	 * The type of the map being tested.
 	 */
-	protected String type;
+	protected String name;
+	
+	/**
+	 * The maximum number of pairs to test.
+	 */
+	protected static int maxPairs = 2000;
 	
 	/**
      * The stopwatch for this experiment
@@ -60,7 +65,7 @@ public abstract class HashMapExperiment {
     /**
      * Map for testing
      */
-    protected Map<String,String> testMap;
+    protected Map<String, String> testMap;
 		
     /**
      * Values for testing
@@ -85,8 +90,8 @@ public abstract class HashMapExperiment {
      */
     static {
     	//initialize keys and values
-    	keys = new String[1000];
-    	values = new String[2000];
+    	keys = new String[maxPairs+1];
+    	values = new String[maxPairs+1];
     	
     	try {
 			Scanner keysIn = new Scanner(new FileInputStream(keysInput));
@@ -101,10 +106,10 @@ public abstract class HashMapExperiment {
     }
     
     /**
-     * An accessor method for type
+     * An accessor method for name
      * @return type
      */
-    public String getType() { return type; }
+    public String getName() { return name; }
 
     /**
      * Reset the testMap.

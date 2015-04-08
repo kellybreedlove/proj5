@@ -305,9 +305,9 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
     	// save them for starter values
     	final int out = i;
     	final int in = j;
-    	System.out.println("i: " + i + ", max: " + secondaries.length);
-    	System.out.println("j: " + j + ", max: " + secondaries[i].numItems);
-    	System.out.println("first value: " + secondaries[i].keys[j]);
+    	//System.out.println("i: " + i + ", max: " + secondaries.length);
+    	//System.out.println("j: " + j + ", max: " + secondaries[i].numItems);
+    	//System.out.println("first value: " + secondaries[i].keys[j]);
         
         return new Iterator<K>() {
     
@@ -316,12 +316,12 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         	int inner = in;
 
         	public boolean hasNext() { 
-        		System.out.println("hasNext");
+        		//System.out.println("hasNext");
         		return outer < secondaries.length && inner < secondaries[outer].keys.length; 
         	}
 
         	public K next() {
-        		System.out.println("next");
+        		//System.out.println("next");
         		K item = secondaries[outer].keys[inner++];
 
         		// find next inner in this outer
@@ -336,7 +336,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         				while (inner < secondaries[outer].keys.length && secondaries[outer].keys[inner] == null) inner++;
         		}
         		
-        		System.out.println("next item: " + item);
+        		//System.out.println("next item: " + item);
         		return item;
         	}
         	public void remove() {

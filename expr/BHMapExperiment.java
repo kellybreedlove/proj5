@@ -12,12 +12,12 @@ import impl.BasicHashMap;
  */
 public class BHMapExperiment extends HashMapExperiment {
 
-	public BHMapExperiment() { type = "BasicHashMap"; reset(); }
+	public BHMapExperiment() { name = "BasicHashMap"; reset(); }
 	
 	/**
 	 * Reset the testMap to a LPHMapTreeMap.
 	 */
 	protected void reset() {
-	    //testMap = (Map<String, String>) new BasicHashMap<String,String>();		
+	    testMap = (Map<String, String>) new BasicHashMap<String,String>(maxPairs/2);		
 	}
 }
