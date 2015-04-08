@@ -55,7 +55,7 @@ public abstract class HashMapExperiment {
 	/**
 	 * The maximum number of pairs to test.
 	 */
-	protected static int maxPairs = 2000;
+	protected static int maxPairs = 7000;
 	
 	/**
      * The stopwatch for this experiment
@@ -80,8 +80,8 @@ public abstract class HashMapExperiment {
     /**
      * The filename for data input
      */
-    protected static String keysInput = "expr/namesKeys", 
-	valuesInput = "expr/namesValues";
+    protected static String keysInput = "expr/sacramentoCrimeKeys", 
+	valuesInput = "expr/sacramentoCrimeValues";
 
     /*
      *  For some reason this won't work for more than 800 pairs of the 
@@ -90,8 +90,8 @@ public abstract class HashMapExperiment {
      */
     static {
     	//initialize keys and values
-    	keys = new String[maxPairs+1];
-    	values = new String[maxPairs+1];
+    	keys = new String[maxPairs];
+    	values = new String[maxPairs];
     	
     	try {
 			Scanner keysIn = new Scanner(new FileInputStream(keysInput));

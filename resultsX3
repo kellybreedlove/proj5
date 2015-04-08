@@ -1,0 +1,73 @@
+building phm (20)...built.
+BasicHashMap put runtime: 0
+LinearProbHashMap put runtime: 0
+building phm (20)...built.
+PerfectHashMap put runtime: 0
+=======================================================
+BasicHashMap get runtime: 0
+LinearProbHashMap get runtime: 0
+building phm (20)...built.
+PerfectHashMap get runtime: 0
+=======================================================
+BasicHashMap containsKey runtime: 0
+LinearProbHashMap containsKey runtime: 0
+building phm (20)...built.
+PerfectHashMap containsKey runtime: 0
+=======================================================
+BasicHashMap put runtime 5: 0
+BasicHashMap put runtime 10: 0
+BasicHashMap put runtime 15: 0
+BasicHashMap put runtime 20: 0
+=======================================================
+LinearProbHashMap put runtime 5: 0
+LinearProbHashMap put runtime 10: 0
+LinearProbHashMap put runtime 15: 0
+LinearProbHashMap put runtime 20: 0
+=======================================================
+building phm (20)...built.
+PerfectHashMap put runtime 5: 0
+building phm (20)...built.
+PerfectHashMap put runtime 10: 0
+building phm (20)...built.
+PerfectHashMap put runtime 15: 0
+building phm (20)...built.
+PerfectHashMap put runtime 20: 0
+=======================================================
+BasicHashMap put runtime 5: 0
+BasicHashMap put runtime 10: 0
+BasicHashMap put runtime 15: 0
+BasicHashMap put runtime 20: 0
+=======================================================
+LinearProbHashMap put runtime 5: 0
+LinearProbHashMap put runtime 10: 0
+LinearProbHashMap put runtime 15: 0
+LinearProbHashMap put runtime 20: 0
+=======================================================
+building phm (20)...built.
+PerfectHashMap put runtime 5: 0
+building phm (20)...built.
+PerfectHashMap put runtime 10: 0
+building phm (20)...built.
+PerfectHashMap put runtime 15: 0
+building phm (20)...built.
+PerfectHashMap put runtime 20: 0
+=======================================================
+BasicHashMap put runtime 5: 0
+BasicHashMap put runtime 10: 0
+BasicHashMap put runtime 15: 0
+BasicHashMap put runtime 20: 0
+=======================================================
+LinearProbHashMap put runtime 5: 0
+LinearProbHashMap put runtime 10: 0
+LinearProbHashMap put runtime 15: 0
+LinearProbHashMap put runtime 20: 0
+=======================================================
+building phm (20)...built.
+PerfectHashMap put runtime 5: 0
+building phm (20)...built.
+PerfectHashMap put runtime 10: 0
+building phm (20)...built.
+PerfectHashMap put runtime 15: 0
+building phm (20)...built.
+PerfectHashMap put runtime 20: 0
+=======================================================

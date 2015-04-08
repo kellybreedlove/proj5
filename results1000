@@ -1,0 +1,45 @@
+BasicHashMap put runtime: 1
+LinearProbHashMap put runtime: 51
+=======================================================
+BasicHashMap get runtime: 0
+LinearProbHashMap get runtime: 0
+=======================================================
+BasicHashMap containsKey runtime: 3
+LinearProbHashMap containsKey runtime: 0
+=======================================================
+BasicHashMap put runtime 10: 0
+BasicHashMap put runtime 100: 1
+BasicHashMap put runtime 250: 0
+BasicHashMap put runtime 500: 0
+BasicHashMap put runtime 1000: 0
+=======================================================
+LinearProbHashMap put runtime 10: 0
+LinearProbHashMap put runtime 100: 0
+LinearProbHashMap put runtime 250: 1
+LinearProbHashMap put runtime 500: 1
+LinearProbHashMap put runtime 1000: 2
+=======================================================
+BasicHashMap put runtime 10: 0
+BasicHashMap put runtime 100: 0
+BasicHashMap put runtime 250: 0
+BasicHashMap put runtime 500: 0
+BasicHashMap put runtime 1000: 0
+=======================================================
+LinearProbHashMap put runtime 10: 0
+LinearProbHashMap put runtime 100: 0
+LinearProbHashMap put runtime 250: 0
+LinearProbHashMap put runtime 500: 0
+LinearProbHashMap put runtime 1000: 0
+=======================================================
+BasicHashMap put runtime 10: 0
+BasicHashMap put runtime 100: 0
+BasicHashMap put runtime 250: 0
+BasicHashMap put runtime 500: 0
+BasicHashMap put runtime 1000: 1
+=======================================================
+LinearProbHashMap put runtime 10: 0
+LinearProbHashMap put runtime 100: 0
+LinearProbHashMap put runtime 250: 0
+LinearProbHashMap put runtime 500: 0
+LinearProbHashMap put runtime 1000: 0
+=======================================================

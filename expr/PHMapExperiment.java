@@ -12,13 +12,14 @@ import impl.PerfectHashMap;
  */
 public class PHMapExperiment extends HashMapExperiment {
 
-	public PHMapExperiment(int maxPairs) { this.maxPairs = maxPairs; name = "PerfectHashMap"; reset(); }
+	public PHMapExperiment() { name = "PerfectHashMap"; reset(); }
 	
 	/**
 	 * Reset the testMap to a LPHMapTreeMap.
 	 */
 	protected void reset() {
-		System.out.println(keys.length);
+		System.out.print("building phm (" + keys.length + ")...");
 	    testMap = (Map<String, String>) new PerfectHashMap<String,String>(keys);		
+	    System.out.println("built.");
 	}
 }

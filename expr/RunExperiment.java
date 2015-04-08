@@ -14,7 +14,7 @@ public class RunExperiment {
 	/**
 	 * The maximum number of pairs to test.
 	 */
-	private static int maxPairs = 2000;
+	private static int maxPairs = 7000;
 	
 	/**
 	 * The different map experiments to run.
@@ -24,7 +24,7 @@ public class RunExperiment {
 	/**
 	 * An array of testable sizes with maxPairs as its largest value.
 	 */
-	private static int[] sizes = { 10, 100, 250, 500, maxPairs };
+	private static int[] sizes = { 10, 100, 250, 500, 1000, 2000, 3000, 4000, 5000, 6000, maxPairs };
 	
 	/**
 	 * A buffer line to print for easier reading.
@@ -74,7 +74,7 @@ public class RunExperiment {
 	 */
 	private static void getRuntimeBySize(HashMapExperiment map) {
 		for (int i = 0; i < sizes.length; i++)
-			System.out.println(map.getName() + " put runtime " + sizes[i] + ": " + map.getRuntimes(sizes[i]));
+			System.out.println(map.getName() + " get runtime " + sizes[i] + ": " + map.getRuntimes(sizes[i]));
 		System.out.println(line);
 	}
 	
@@ -84,7 +84,7 @@ public class RunExperiment {
 	 */
 	private static void containsKeyRuntimeBySize(HashMapExperiment map) {
 		for (int i = 0; i < sizes.length; i++)
-			System.out.println(map.getName() + " put runtime " + sizes[i] + ": " + map.containsKeyRuntimes(sizes[i]));
+			System.out.println(map.getName() + " containsKey runtime " + sizes[i] + ": " + map.containsKeyRuntimes(sizes[i]));
 		System.out.println(line);
 	}	
 	
